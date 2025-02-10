@@ -3,7 +3,7 @@
 
   inputs = {
     systems.url = "github:nix-systems/default";
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-parts.url = "github:hercules-ci/flake-parts";
     pre-commit-hooks-nix.url = "github:cachix/pre-commit-hooks.nix";
     nixos-generators = { url = "github:nix-community/nixos-generators"; inputs = { nixpkgs.follows = "nixpkgs"; }; };
@@ -41,7 +41,7 @@
               owner = "imunes";
               repo = "imunes";
               rev = "1a9d483";
-              sha256 = "sha256-KZQwFTVaTaBw1OtjGvf2ngQVLKd1b/h2GtTRiShCAHc=";
+              sha256 = "sha256-hw1KSxluJdA6Jiz1VzMo5IIex4AsTjSy2GklFeRpNWE=";
             };
 
           };
