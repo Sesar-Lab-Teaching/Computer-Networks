@@ -74,7 +74,6 @@
       nixosModules = {
         default_config = {
           nix.extraOptions = "experimental-features = nix-command flakes";
-          services.qemuGuest.enable = true;
         };
 
         graphical_environment = {
@@ -106,6 +105,10 @@
 
               # Enable Docker
               virtualisation.docker.enable = true;
+
+              # Virtualisation guest services
+              services.qemuGuest.enable = true;
+              virtualisation.vmware.guest.enable = true;
             };
           };
 
@@ -115,17 +118,22 @@
             self.nixosModules.graphical_environment
             self.nixosModules.imunes
             ({ pkgs, ... }: {
-              system.stateVersion = "24.05";
+              system.stateVersion = "24.11";
               users.users.user = {
                 isNormalUser = true;
                 extraGroups = [ "network" "networkmanager" "wheel" "docker" ];
                 password = "retiunimi";
               };
-              environment.systemPackages = [ pkgs.nmap ];
+              environment.systemPackages = with pkgs; [
+                curl
+                inetutils
+                iputils
+                netcat
+                nmap
+              ];
               virtualisation.imunes.enable = true;
               virtualisation.vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
             })
-
           ];
         };
       };
@@ -134,14 +142,14 @@
         x86_64-linux.computer-networks-vm = inputs.nixos-generators.nixosGenerate {
           system = "x86_64-linux";
           modules = [ self.nixosModules.computer-networks ];
-          format = "qcow"
+          format = "qcow-efi"
           ;
         };
 
         aarch64-linux.computer-networks-vm = inputs.nixos-generators.nixosGenerate {
           system = "aarch64-linux";
           modules = [ self.nixosModules.computer-networks ];
-          format = "qcow";
+          format = "qcow-efi";
         };
       };
 
