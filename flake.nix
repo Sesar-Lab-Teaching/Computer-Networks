@@ -105,10 +105,6 @@
 
               # Enable Docker
               virtualisation.docker.enable = true;
-
-              # Virtualisation guest services
-              services.qemuGuest.enable = true;
-              virtualisation.vmware.guest.enable = true;
             };
           };
 
@@ -133,6 +129,10 @@
               ];
               virtualisation.imunes.enable = true;
               virtualisation.vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
+
+              # Virtualisation guest services
+              services.qemuGuest.enable = true;
+              virtualisation.vmware.guest.enable = true;
             })
           ];
         };
