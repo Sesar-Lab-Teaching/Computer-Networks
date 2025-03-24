@@ -126,6 +126,13 @@
                 iputils
                 netcat
                 nmap
+
+                helix
+                nano
+                neovim
+                vim
+
+                postman
               ];
               virtualisation.imunes.enable = true;
               virtualisation.vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
