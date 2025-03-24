@@ -121,7 +121,9 @@
                 password = "retiunimi";
               };
               environment.systemPackages = with pkgs; [
+                bind
                 curl
+                dnsutils
                 inetutils
                 iputils
                 netcat
@@ -133,30 +135,58 @@
                 vim
 
                 postman
-              ];
-              virtualisation.imunes.enable = true;
-              virtualisation.vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
 
-              # Virtualisation guest services
+                stdenv.cc
+              ];
+              virtualisation = {
+                imunes.enable = true;
+                vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
+                diskSize = 30 * 1024;
+                vmware.guest.enable = true;
+              };
               services.qemuGuest.enable = true;
-              virtualisation.vmware.guest.enable = true;
+              systemd.user.services.update-imunes-images = {
+                Unit = {
+                  Description = "Pull imunes images from docker";
+                  Script = ''
+                    docker pull imunes/template
+                    docker pull imunes/vroot
+                  '';
+                };
+                Service = {
+                  Restart = "on-failure";
+                  RestartSec = 3;
+                };
+                wantedBy = [ "multi-user.target" ]; # starts after login
+              };
             })
           ];
         };
       };
 
       packages = {
-        x86_64-linux.computer-networks-vm = inputs.nixos-generators.nixosGenerate {
+        x86_64-linux.computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
           system = "x86_64-linux";
           modules = [ self.nixosModules.computer-networks ];
-          format = "qcow-efi"
-          ;
+          format = "qcow-efi";
         };
 
-        aarch64-linux.computer-networks-vm = inputs.nixos-generators.nixosGenerate {
+        x86_64-linux.computer-networks-virtualbox = inputs.nixos-generators.nixosGenerate {
+          system = "x86_64-linux";
+          modules = [ self.nixosModules.computer-networks ];
+          format = "virtualbox";
+        };
+
+        aarch64-linux.computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
           system = "aarch64-linux";
           modules = [ self.nixosModules.computer-networks ];
           format = "qcow-efi";
+        };
+
+        aarch64-linux.computer-networks-virtualbox = inputs.nixos-generators.nixosGenerate {
+          system = "aarch64-linux";
+          modules = [ self.nixosModules.computer-networks ];
+          format = "virtualbox";
         };
       };
 
