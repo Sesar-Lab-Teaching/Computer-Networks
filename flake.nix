@@ -146,18 +146,16 @@
               };
               services.qemuGuest.enable = true;
               systemd.user.services.update-imunes-images = {
-                Unit = {
-                  Description = "Pull imunes images from docker";
-                  Script = ''
-                    docker pull imunes/template
-                    docker pull imunes/vroot
-                  '';
-                };
-                Service = {
+                description = "Pull imunes images from docker";
+                script = ''
+                  docker pull imunes/template
+                  docker pull imunes/vroot
+                '';
+                wantedBy = [ "multi-user.target" ]; # starts after login
+                serviceConfig = {
                   Restart = "on-failure";
                   RestartSec = 3;
                 };
-                wantedBy = [ "multi-user.target" ]; # starts after login
               };
             })
           ];
