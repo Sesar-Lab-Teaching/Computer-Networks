@@ -108,34 +108,38 @@
             };
           };
 
+        minimal_environment = { pkgs, ... }: {
+          environment.systemPackages = with pkgs; [
+            bind
+            curl
+            dnsutils
+            inetutils
+            iputils
+            netcat
+            nmap
+
+            helix
+            nano
+            neovim
+            vim
+
+            stdenv.cc
+          ];
+        };
+
         computer-networks = {
           imports = [
             self.nixosModules.default_config
-            self.nixosModules.graphical_environment
             self.nixosModules.imunes
-            ({ pkgs, ... }: {
+            self.nixosModules.minimal_environment
+            self.nixosModules.graphical_environment
+            {
               system.stateVersion = "24.11";
               users.users.user = {
                 isNormalUser = true;
                 extraGroups = [ "network" "networkmanager" "wheel" "docker" ];
                 password = "retiunimi";
               };
-              environment.systemPackages = with pkgs; [
-                bind
-                curl
-                dnsutils
-                inetutils
-                iputils
-                netcat
-                nmap
-
-                helix
-                nano
-                neovim
-                vim
-
-                stdenv.cc
-              ];
               virtualisation = {
                 imunes.enable = true;
                 vmVariant.virtualisation = { memorySize = 2048; cores = 2; };
@@ -155,36 +159,60 @@
                   RestartSec = 3;
                 };
               };
-            })
+            }
           ];
         };
       };
 
-      packages = {
-        x86_64-linux.computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
-          system = "x86_64-linux";
-          modules = [ self.nixosModules.computer-networks ];
-          format = "qcow-efi";
-        };
+      packages =
+        let vm-modules = [ self.nixosModules.computer-networks ];
+        in {
+          x86_64-linux = {
+            computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
+              system = "x86_64-linux";
+              modules = vm-modules;
+              format = "qcow-efi";
+            };
 
-        x86_64-linux.computer-networks-virtualbox = inputs.nixos-generators.nixosGenerate {
-          system = "x86_64-linux";
-          modules = [ self.nixosModules.computer-networks ];
-          format = "virtualbox";
-        };
+            computer-networks-raw-efi = inputs.nixos-generators.nixosGenerate {
+              system = "x86_64-linux";
+              modules = vm-modules;
+              format = "raw-efi";
+            };
 
-        aarch64-linux.computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
-          system = "aarch64-linux";
-          modules = [ self.nixosModules.computer-networks ];
-          format = "qcow-efi";
-        };
+            computer-networks-virtualbox = inputs.nixos-generators.nixosGenerate {
+              system = "x86_64-linux";
+              modules = vm-modules;
+              format = "virtualbox";
+            };
 
-        aarch64-linux.computer-networks-virtualbox = inputs.nixos-generators.nixosGenerate {
-          system = "aarch64-linux";
-          modules = [ self.nixosModules.computer-networks ];
-          format = "virtualbox";
+            computer-networks-vmware = inputs.nixos-generators.nixosGenerate {
+              system = "x86_64-linux";
+              modules = vm-modules;
+              format = "vmware";
+            };
+          };
+
+          aarch64-linux = {
+            computer-networks-qcow-efi = inputs.nixos-generators.nixosGenerate {
+              system = "aarch64-linux";
+              modules = vm-modules;
+              format = "qcow-efi";
+            };
+
+            computer-networks-raw-efi = inputs.nixos-generators.nixosGenerate {
+              system = "aarch64-linux";
+              modules = vm-modules;
+              format = "raw-efi";
+            };
+
+            computer-networks-vmware = inputs.nixos-generators.nixosGenerate {
+              system = "aarch64-linux";
+              modules = vm-modules;
+              format = "vmware";
+            };
+          };
         };
-      };
 
       nixosConfigurations = {
         computer-networks-arm64 = nixpkgs.lib.nixosSystem {
