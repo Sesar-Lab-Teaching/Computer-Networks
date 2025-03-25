@@ -134,8 +134,6 @@
                 neovim
                 vim
 
-                postman
-
                 stdenv.cc
               ];
               virtualisation = {
