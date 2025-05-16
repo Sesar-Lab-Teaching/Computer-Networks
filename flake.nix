@@ -76,6 +76,15 @@
           nix.extraOptions = "experimental-features = nix-command flakes";
         };
 
+        auto_update = {
+          system.autoUpgrade = {
+            enable = true;
+            flake = "github:Sesar-Lab-Teaching/Computer-Networks";
+            randomizedDelaySec = "45min";
+            flags = [ "--refresh" ];
+          };
+        };
+
         graphical_environment = {
           services.xserver = {
             enable = true;
@@ -134,6 +143,7 @@
             self.nixosModules.imunes
             self.nixosModules.minimal_environment
             self.nixosModules.graphical_environment
+            self.nixosModules.auto_update
             {
               system.stateVersion = "24.11";
               users.users.user = {
