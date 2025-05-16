@@ -113,6 +113,7 @@
             bind
             curl
             dnsutils
+            frr
             inetutils
             iputils
             netcat
